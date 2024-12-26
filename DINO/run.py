@@ -6,6 +6,7 @@ from pygame import time
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1280,400))
+img_track = pygame.image.load("track.png")
 
 clock = pygame.time.Clock()
 running = True
@@ -16,20 +17,25 @@ img_dinorun = [pygame.image.load("DinoRun1.png"),pygame.image.load("DinoRun2.png
 img_dinoduck = [pygame.image.load("DinoDuck1.png"),pygame.image.load("DinoDuck2.png")]
 img_birdrun = [pygame.image.load("Bird1.png"),pygame.image.load("Bird2.png")]
 cactus_rect = img_cactus.get_rect()
-cactus_rect.x = 3000
+cactus_rect.x = random.randint(2500,4000)
 cactus_rect.y = 330
 dino_rect = img_dino.get_rect()
 dino_rect.x = 50
 dino_rect.y = 300
 bird_rect = img_bird.get_rect()
-bird_rect.x = 10000
+bird_rect.x = random.randint(8000,12000)
 bird_rect.y = 250
 is_jumping = False
 default_jump = 24
 jump = default_jump
-cactus_run=12
+initspeed= 12
+cactus_run=initspeed
+
+
 g = 1.5
 score = 0
+level = 0
+levelspeed = [12,16,20,30,40]
 highscore = 0
 gameover = False
 font = pygame.font.Font(None,36)
@@ -55,6 +61,7 @@ while running:
                     score = 0
                     cactus_rect.x = 3000
                     bird_rect.x = random.randint(10000,15000)
+                    cactus_run=initspeed
             if event.type == pygame.MOUSEBUTTONDOWN:
                 is_jumping = True
             if event.type == pygame.KEYUP:
@@ -65,8 +72,16 @@ while running:
                     
 
     if not gameover:
-
-        
+        score +=1
+        if score>3000:
+            cactus_run = levelspeed[3]
+            level = 3
+        elif score >2000:
+            cactus_run = levelspeed[2]
+            level =2
+        elif score >1000:
+            cactus_run = levelspeed[1]
+            level = 1
         if is_jumping:
             
             dino_rect.y -= jump
@@ -75,26 +90,21 @@ while running:
                 dino_rect.y   =300 
                 is_jumping = False                                                               
                 jump = default_jump
-        cactus_run = 30#random.randint(30,50)
-        
-        if cactus_run > 45:
-            cactus_run += 50
+        #random.randint(30,50)
+  
         cactus_rect.x-=cactus_run
         if cactus_rect.x <  0:
-            cactus_rect.x = 1200
-            score +=1   
+            cactus_rect.x = random.randint(1280,3000)
+       
         bird_rect.x -= cactus_run
         if bird_rect.x <  0:
             bird_rect.x = random.randint(3000,5000)
-            score +=1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-        if dino_rect.colliderect(cactus_rect):
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+        if dino_rect.colliderect(cactus_rect) or dino_rect.colliderect(bird_rect):
             gameover = True
             if highscore < score:
                 highscore = score
-        if dino_rect.colliderect(bird_rect):
-            gameover = True
-            if highscore < score:
-                highscore = score
+       
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((255,255,255))
         
@@ -117,8 +127,11 @@ while running:
                     
                     screen.blit(img_dinorun[frame],dino_rect)
         highscore_show = font.render(f"highest score:{highscore}",True,(0,0,0))
+        level_show = font.render(f"Level: {level}",True, (0,0,0))
+        screen.blit(level_show,(10,55))
         # RENDER YOUR GAME HERE
-        
+    
+        screen.blit(img_track,(0,370)) 
             
         screen.blit(score_show,(10,10))
         screen.blit(highscore_show,(10,35))
